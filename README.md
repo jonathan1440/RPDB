@@ -36,6 +36,11 @@ MemorySegment is not designed specifically for this project, and there is a bit 
 All instances of the above classes keep a list of the addresses of `Link`s they are involved in in their attribute `.links`.
 
 ## Class structure
+- `MemorySegment(iterable=None, empty_values=None)` extends `list`
+  - `.store_obj(object_, addr=None)` - returns addr where object was stored in list.
+  - `.delete_obj(add)` - removes object at addr from list.
+  - `.check_empty_values()` - find skipped addresses in list.
+  - `.search(attr, value)` - return list of objects in list with attr equal to value.
 - `Noun(mem, name, instance_of=None, addr=None, links=None)`
   - `.mem`
   - `.name`
@@ -53,7 +58,7 @@ All instances of the above classes keep a list of the addresses of `Link`s they 
   - `.linking_verb`
   - `.thing2`
   - `.links`
-- They all share:
+- Noun, Link, and LinkingVerb all share:
   - `.__dict__()`
   - `.delete()` - use instead of `del <Noun/LinkingVerb/Link>`.
   - `.add_link(link_addr)` - adds `link_addr` to `self.links`. This is done automatically every time a new `Link` is created.
