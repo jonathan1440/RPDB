@@ -34,3 +34,29 @@ MemorySegment is not designed specifically for this project, and there is a bit 
 <br>It is possible to create a `Link` between any of these three classes, although I'm considering removing the ability to do so with `Link`s.
 
 All instances of the above classes keep a list of the addresses of `Link`s they are involved in in their attribute `.links`.
+
+## Class structure
+- `Noun(mem, name, instance_of=None, addr=None, links=None)`
+  - `.mem`
+  - `.name`
+  - `.instance_of`
+  - `.addr`
+  - `.links`
+- `LinkingVerb(mem, name, addr=None, links=None)`
+  - `.mem`
+  - `.name`
+  - `.addr`
+  - `.links`
+- `Link(mem, thing1, linking_verb, thing2, addr=None, links=None)`
+  - `.mem`
+  - `.thing1`
+  - `.linking_verb`
+  - `.thing2`
+  - `.links`
+- They all share:
+  - `.__dict__()`
+  - `.delete()` - use instead of `del <Noun/LinkingVerb/Link>`.
+  - `.add_link(link_addr)` - adds `link_addr` to `self.links`. This is done automatically every time a new `Link` is created.
+  - `.remove_link(link_addr)` - removes `link_addr` from `self.links`. Called by `Link.delete()`.
+  - `.list_links()` - return list of `Link` objects in `self.links`.
+  - `.list_linked()` - return list of objects involved in links in `self.links`.
