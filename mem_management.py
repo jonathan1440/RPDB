@@ -2,17 +2,34 @@ import json
 
 
 class MemorySegment(list):
+    """
+    The idea is to have a modified list class for storing objects that care about their address.
+    It provides ways of manipulating the list that avoid changing the locations where the object pointers are stored.
+    """
     HOLE = object()
-
-    def __init__(self, iterable=None, empty_values=None):
+    def __init__(self, iterable: [object] = None, empty_values: [int] = None):
+        """
+        :param iterable: [object] If initializing with a populated list
+        :param empty_values: [int] list of indices storing "None"
+        """
         if empty_values is None:
             empty_values = []
         if iterable is None:
             iterable = []
+        else:
+            while True:
+                try:
+                    index = iterable.index(None)
+                except ValueError:
+                    break
+                iterable[index] = self.HOLE
 
-        super().__init__(iterable)
+        super(MemorySegment, self).__init__(iterable)
 
         self.empty_values = empty_values
+
+        if self:
+            self.check_empty_values()
 
     def __delitem__(self, index):
         if hasattr(self[index], 'del'):
@@ -23,13 +40,13 @@ class MemorySegment(list):
         return (
             item
             for item in super().__iter__()
-            if item is not self.HOLE
+            if item is not None
         )
 
     def __getitem__(self, item):
         value = super().__getitem__(item)
         if value is self.HOLE:
-            return None
+            return self.HOLE
         else:
             return value
 
@@ -38,6 +55,7 @@ class MemorySegment(list):
         super().__setitem__(key, value)
 
     def __dict__(self):
+        # TODO: currently only works if stored objects have .__dict__() defined
         dictified = {
             "__class__": self.__class__.__name__,
             "__module__": self.__module__,
@@ -46,8 +64,8 @@ class MemorySegment(list):
         }
 
         for item in self:
-            if item is self.HOLE:
-                continue
+            if item is self.HOLE or item is None:
+                dictified['iterable'].append(self.HOLE)
             elif hasattr(item, '__dict__'):
                 dictified['iterable'].append(item.__dict__())
             else:
@@ -55,10 +73,13 @@ class MemorySegment(list):
         return dictified
 
     def store_obj(self, object_, addr=None):
+        # TODO: decide if this if statement is helpful or not
         if addr is None:
             if hasattr(object_, "addr"):
+                # print("storing object at object.addr")
                 if object_.addr:
                     addr = object_.addr
+
         if addr is None:
             if len(self.empty_values) > 0:
                 addr = self.empty_values[0]
@@ -71,10 +92,10 @@ class MemorySegment(list):
             if len(self) <= addr:
                 while len(self) < addr:
                     self.empty_values.append(len(self))
-                    self.append(None)
+                    self.append(self.HOLE)
                 self.append(object_)
             else:
-                if self[addr] is None:
+                if self[addr] is self.HOLE:
                     self[addr] = object_
                 else:
                     addr = -1
@@ -82,15 +103,15 @@ class MemorySegment(list):
         return addr
 
     def delete_obj(self, addr):
-        self[addr] = self.HOLE
+        del self[addr]
 
     def check_empty_values(self):
         for index in self.empty_values:
-            if self[index] is not None:
+            if self[index] is not self.HOLE:
                 self.empty_values = self.empty_values[:index] + self.empty_values[index+1:]
 
-        for index, item in enumerate(self):
-            if item is None:
+        for index in range(len(self)):
+            if self[index] is self.HOLE:
                 self.empty_values.append(index)
 
     def search(self, attr: str, value):
@@ -100,19 +121,3 @@ class MemorySegment(list):
                 if getattr(item, attr) == value:
                     results.append(index)
         return results
-
-
-def write_segments(json_filepath: str, segments: [MemorySegment], segment_order: [str]):
-    data = {}
-
-    for index, segment in enumerate(segments):
-        data[segment_order[index]] = segment.__dict__()
-
-    with open(json_filepath, 'w') as file:
-        file.truncate()
-        json.dump(data, file)
-
-
-def load_segments(json_filepath: str):
-    with open(json_filepath, 'r') as file:
-        return json.load(file)

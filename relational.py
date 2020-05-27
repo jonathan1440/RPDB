@@ -1,7 +1,3 @@
-#
-# Usa
-#
-
 from mem_management import *
 import json
 
@@ -218,8 +214,6 @@ def newMemorySegment():
 
 def write_mem_seg(data: MemorySegment, json_filepath: str):
     """
-    TODO: find out if this only works if the .json file is pre-existing.
-    TODO: it needs to be run twice??
     :param data: MemorySegment
     :param json_filepath: str
     :return: None
@@ -257,7 +251,7 @@ def testrun(mem_seg):
     person = Noun(DB, "person").addr
     jz = Noun(DB, "Jonathan", person).addr
     bz = Noun(DB, "Benjamin", person).addr
-    sibling = Noun(DB, "are siblings").addr
+    sibling = LinkingVerb(DB, "are siblings").addr
     Link(DB, jz, sibling, bz)
     write_mem_seg(DB, "test.json")
     AB = load_mem_seg("test.json")
