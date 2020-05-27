@@ -1,4 +1,4 @@
-from mem_management import *
+from functional.mem_management import *
 import json
 
 
@@ -102,7 +102,7 @@ class Word(Linkable):
 class LinkingVerb(Word):
     def __init__(self, mem: MemorySegment, name: str, addr: int = None, links: [int] = None):
         """
-        Eg. "is" or "has". Generally denoting posession or definition.
+        Eg. "is" or "has". Generally denoting possession or definition.
         A linking verb called "is" should always be stored at index 0 of self.mem.
         This is done automatically by newMemorySegment().
         :param mem: MemorySegment

@@ -1,7 +1,7 @@
 # RPDB
 A relational database using python and json
 
-I don't know much about databases, so this may be better described as a relational interpreter.
+This may actually be better described as a relational interpreter.
 
 ## Brief example
 This is explaied below in **Conceptual overview**

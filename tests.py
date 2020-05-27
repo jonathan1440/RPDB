@@ -1,7 +1,7 @@
 import os
 import unittest
-from relational import *
-from mem_management import *
+from functional.relational import *
+from functional.mem_management import *
 
 
 class msTestClass:
@@ -81,5 +81,5 @@ class TestStorageMethods(unittest.TestCase):
 
 
 class TestRelationalMethods(unittest.TestCase):
-    # TODO: complete this
+    # TODO: complete this... later
     pass
